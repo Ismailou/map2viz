@@ -24,7 +24,16 @@ def get_line_number(phrase, file_name):
 		for i, line in enumerate(f, 1):
 			if phrase in line:
 				return i
-				
+
+def addr_in_sector(sector,addr):
+	sector_addr = sector*1024 + 0x08000000
+	#print sector_addr
+	addr_hex = int(addr,16)
+	if (addr_hex > sector_addr and addr_hex < (sector_addr+0x400)):
+		return True
+	else:
+		return False
+						
 #===============================
 # Load the Sections and Symbols
 #
@@ -72,31 +81,37 @@ if __name__ == "__main__":
 					symbols.append(Symbol(addr_size_module_entries[1], addr_size_module_entries[2], addr_size_module_entries[3], addr_symbol_entries[1].replace(".text.", "")))
 
 					
-	for s in symbols:
-		print s.address, s.size, s.file, s.name
+#	for s in symbols:
+#		print s.address, s.size, s.file, s.name
 					
 				
     		
-''' 	
-		#print(line)
-		m = re.search('^ (.text)', line)
-		if m:
-			print(line)
-			print
-			n = re.match('^.',line)
-			print m,'-->', get_line_number(m.group(0),'C300_PCPU_APP_DEBUG_C1.map')
-			if n:
-				print(line)
-#		if in_sections:
-#			if in_sections:
-#				sections.append(Section(eval(m.group(1)), eval(m.group(2)), m.group(3), m.group(5)))
-#			else:
-#				symbols.append(Symbol(eval(m.group(1)), eval(m.group(2)), m.group(3), m.group(5)))
-#		else:
-#			if len(sections) > 0:
-#				in_sections = False
+ 	
+#===============================
+# Print memory mapping in the console
+#
+sector=17
+current_address=0x00
+symbol_Idx=0
+current_address = int(symbols[0].address,16)
 
-
+print "_________________________________________________"
+#for s in symbols:
+while ( current_address < 0x0800ffff and  (addr_in_sector(sector,symbols[symbol_Idx].address) == True)):
+	if ( addr_in_sector(sector,symbols[symbol_Idx].address) == True):
+		addr = int(symbols[symbol_Idx].address,16) 
+		if ( current_address == addr):
+			print format(current_address, '#04x'), "|\t", symbols[symbol_Idx].name
+		else:
+			print format(current_address, '#04x'), "|\t\t\t\t|"
+			#print format(current_address, '#04x'), format(addr, '#04x')
+		current_address+=4
+		
+		if ( current_address >= ( int(symbols[symbol_Idx].address,0)+int(symbols[symbol_Idx].size,0) ) ):
+			symbol_Idx = symbol_Idx+1
+			#print symbol_Idx
+			#print format(current_address, '#04x')
+'''
 #===============================
 # Gererate the HTML File
 #
