@@ -29,6 +29,7 @@ def addr_in_sector(sector,addr):
 	sector_addr = sector*1024 + 0x08000000
 	#print sector_addr
 	addr_hex = int(addr,16)
+	#print format(sector_addr, '#04x'), format(addr_hex, '#04x')
 	if (addr_hex > sector_addr and addr_hex < (sector_addr+0x400)):
 		return True
 	else:
@@ -90,27 +91,36 @@ if __name__ == "__main__":
 #===============================
 # Print memory mapping in the console
 #
-sector=17
+sector=20
 current_address=0x00
 symbol_Idx=0
 current_address = int(symbols[0].address,16)
 
 print "_________________________________________________"
 #for s in symbols:
-while ( current_address < 0x0800ffff and  (addr_in_sector(sector,symbols[symbol_Idx].address) == True)):
-	if ( addr_in_sector(sector,symbols[symbol_Idx].address) == True):
-		addr = int(symbols[symbol_Idx].address,16) 
+while ( current_address < 0x0800ffff):
+	while (addr_in_sector(sector,symbols[symbol_Idx].address) == True) :
+		#if ( addr_in_sector(sector,symbols[symbol_Idx].address) == True):
+		addr = int(symbols[symbol_Idx].address,16)
+		#print format(current_address, '#04x'), format(addr, '#04x')
 		if ( current_address == addr):
 			print format(current_address, '#04x'), "|\t", symbols[symbol_Idx].name
 		else:
 			print format(current_address, '#04x'), "|\t\t\t\t|"
-			#print format(current_address, '#04x'), format(addr, '#04x')
+
 		current_address+=4
-		
+
 		if ( current_address >= ( int(symbols[symbol_Idx].address,0)+int(symbols[symbol_Idx].size,0) ) ):
 			symbol_Idx = symbol_Idx+1
 			#print symbol_Idx
 			#print format(current_address, '#04x')
+		
+		
+				
+	current_address+=4
+	current_address+=int(symbols[symbol_Idx].size,0)
+	symbol_Idx = symbol_Idx+1
+	#print symbol_Idx
 '''
 #===============================
 # Gererate the HTML File
